@@ -1,0 +1,50 @@
+{
+  "name": "showup_two_hour",
+  "category": "UTILITY",
+  "variables": [
+    "patient_name",
+    "clinic_name",
+    "time",
+    "directions",
+    "parking"
+  ],
+  "buttons": [],
+  "languages": {
+    "en": {
+      "body": "Hi {{1}}, see you at {{2}} today at {{3}}. Directions: {{4}} Parking: {{5}} Reply here if you are running late.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "10:30 AM",
+        "https://maps.google.com/?q=Kalyan+West",
+        "Free parking inside the society compound"
+      ]
+    },
+    "hi": {
+      "body": "नमस्ते {{1}}, आज {{2}} में {{3}} पर मिलते हैं। रास्ता: {{4}} पार्किंग: {{5}} अगर आपको देर हो रही है तो यहीं जवाब दें।",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "10:30 AM",
+        "https://maps.google.com/?q=Kalyan+West",
+        "Free parking inside the society compound"
+      ]
+    },
+    "mr": {
+      "body": "नमस्कार {{1}}, आज {{2}} येथे {{3}} ला भेटूया. मार्ग: {{4}} पार्किंग: {{5}} उशीर होत असल्यास येथेच उत्तर द्या.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "10:30 AM",
+        "https://maps.google.com/?q=Kalyan+West",
+        "Free parking inside the society compound"
+      ]
+    }
+  }
+}

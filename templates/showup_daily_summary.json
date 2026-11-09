@@ -1,0 +1,29 @@
+{
+  "name": "showup_daily_summary",
+  "category": "UTILITY",
+  "recipient": "doctor",
+  "variables": [
+    "doctor_name",
+    "date",
+    "total",
+    "confirmed",
+    "unconfirmed",
+    "open_slots"
+  ],
+  "buttons": [],
+  "languages": {
+    "en": {
+      "body": "Good morning {{1}}. Today at {{2}}: {{3}} appointments, {{4}} confirmed, {{5}} not yet confirmed. Open slots: {{6}}. Have a good day.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Dr. Neha Kulkarni",
+        "Tue 10 Nov",
+        "12",
+        "9",
+        "3",
+        "11:00, 12:30, 18:15"
+      ]
+    }
+  }
+}

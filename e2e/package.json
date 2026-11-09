@@ -1,0 +1,13 @@
+{
+  "name": "showup-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  }
+}

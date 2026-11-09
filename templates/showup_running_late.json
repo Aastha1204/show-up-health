@@ -1,0 +1,46 @@
+{
+  "name": "showup_running_late",
+  "category": "UTILITY",
+  "variables": [
+    "patient_name",
+    "doctor_name",
+    "delay_min",
+    "time"
+  ],
+  "buttons": [],
+  "languages": {
+    "en": {
+      "body": "Hi {{1}}, {{2}} is running about {{3}} minutes late today. Your {{4}} appointment may start a little later. We are sorry for the wait.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "Dr. Neha Kulkarni",
+        "30",
+        "10:30 AM"
+      ]
+    },
+    "hi": {
+      "body": "नमस्ते {{1}}, {{2}} आज लगभग {{3}} मिनट देरी से चल रहे हैं। आपकी {{4}} की अपॉइंटमेंट थोड़ी देर से शुरू हो सकती है। इंतज़ार के लिए हमें खेद है।",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "Dr. Neha Kulkarni",
+        "30",
+        "10:30 AM"
+      ]
+    },
+    "mr": {
+      "body": "नमस्कार {{1}}, {{2}} आज सुमारे {{3}} मिनिटे उशिरा आहेत. तुमची {{4}} ची अपॉइंटमेंट थोडी उशिरा सुरू होऊ शकते. वाट पाहावी लागल्याबद्दल क्षमस्व.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "Dr. Neha Kulkarni",
+        "30",
+        "10:30 AM"
+      ]
+    }
+  }
+}

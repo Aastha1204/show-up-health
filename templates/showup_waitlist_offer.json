@@ -1,0 +1,72 @@
+{
+  "name": "showup_waitlist_offer",
+  "category": "UTILITY",
+  "variables": [
+    "patient_name",
+    "clinic_name",
+    "date",
+    "time",
+    "doctor_name",
+    "ttl_min"
+  ],
+  "buttons": [
+    {
+      "id": "WL_BOOK",
+      "payload": "WL_BOOK:{offer_id}"
+    },
+    {
+      "id": "WL_SKIP",
+      "payload": "WL_SKIP:{offer_id}"
+    }
+  ],
+  "languages": {
+    "en": {
+      "body": "Hi {{1}}, a slot has opened at {{2}} on {{3}} at {{4}} with {{5}}. We are holding it for you for {{6}} minutes. Would you like it?",
+      "footer": null,
+      "button_labels": {
+        "WL_BOOK": "Book",
+        "WL_SKIP": "Not now"
+      },
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "11:00 AM",
+        "Dr. Neha Kulkarni",
+        "15"
+      ]
+    },
+    "hi": {
+      "body": "नमस्ते {{1}}, {{2}} में {{3}} को {{4}} पर {{5}} के साथ एक स्लॉट खाली हुआ है। हम इसे आपके लिए {{6}} मिनट तक रोक रहे हैं। क्या आप इसे लेना चाहेंगे?",
+      "footer": null,
+      "button_labels": {
+        "WL_BOOK": "बुक करें",
+        "WL_SKIP": "अभी नहीं"
+      },
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "11:00 AM",
+        "Dr. Neha Kulkarni",
+        "15"
+      ]
+    },
+    "mr": {
+      "body": "नमस्कार {{1}}, {{2}} येथे {{3}} रोजी {{4}} ला {{5}} यांच्यासोबत एक वेळ मोकळी झाली आहे. आम्ही ती तुमच्यासाठी {{6}} मिनिटे राखून ठेवत आहोत. तुम्हाला ती हवी आहे का?",
+      "footer": null,
+      "button_labels": {
+        "WL_BOOK": "बुक करा",
+        "WL_SKIP": "आत्ता नको"
+      },
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "11:00 AM",
+        "Dr. Neha Kulkarni",
+        "15"
+      ]
+    }
+  }
+}

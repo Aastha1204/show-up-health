@@ -1,0 +1,61 @@
+{
+  "name": "showup_recall",
+  "category": "UTILITY",
+  "category_note": "Meta may re-categorise this template as MARKETING, which changes its price.",
+  "variables": [
+    "patient_name",
+    "months",
+    "clinic_name"
+  ],
+  "buttons": [
+    {
+      "id": "RECALL_BOOK",
+      "payload": "RECALL_BOOK:{patient_id}"
+    },
+    {
+      "id": "RECALL_SKIP",
+      "payload": "RECALL_SKIP:{patient_id}"
+    }
+  ],
+  "languages": {
+    "en": {
+      "body": "Hi {{1}}, it has been {{2}} months since your last visit to {{3}}. Would you like us to book your next check-up?",
+      "footer": null,
+      "button_labels": {
+        "RECALL_BOOK": "Book now",
+        "RECALL_SKIP": "Not now"
+      },
+      "example": [
+        "Priya",
+        "6",
+        "SmileCare Dental Clinic"
+      ]
+    },
+    "hi": {
+      "body": "नमस्ते {{1}}, आपकी पिछली विज़िट को {{2}} महीने हो चुके हैं। क्या {{3}} में आपका अगला चेक-अप बुक कर दें?",
+      "footer": null,
+      "button_labels": {
+        "RECALL_BOOK": "अभी बुक करें",
+        "RECALL_SKIP": "अभी नहीं"
+      },
+      "example": [
+        "Priya",
+        "6",
+        "SmileCare Dental Clinic"
+      ]
+    },
+    "mr": {
+      "body": "नमस्कार {{1}}, तुमच्या मागच्या भेटीला {{2}} महिने झाले आहेत. {{3}} येथे तुमचा पुढचा चेक-अप बुक करू का?",
+      "footer": null,
+      "button_labels": {
+        "RECALL_BOOK": "आता बुक करा",
+        "RECALL_SKIP": "आत्ता नको"
+      },
+      "example": [
+        "Priya",
+        "6",
+        "SmileCare Dental Clinic"
+      ]
+    }
+  }
+}

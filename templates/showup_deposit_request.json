@@ -1,0 +1,54 @@
+{
+  "name": "showup_deposit_request",
+  "category": "UTILITY",
+  "variables": [
+    "patient_name",
+    "clinic_name",
+    "date",
+    "time",
+    "amount",
+    "payment_link"
+  ],
+  "buttons": [],
+  "languages": {
+    "en": {
+      "body": "Hi {{1}}, to hold your appointment at {{2}} on {{3}} at {{4}}, please pay the booking deposit of ₹{{5}} here: {{6}} Thank you.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "10:30 AM",
+        "500",
+        "https://rzp.io/i/abc123"
+      ]
+    },
+    "hi": {
+      "body": "नमस्ते {{1}}, {{2}} में {{3}} को {{4}} की आपकी अपॉइंटमेंट पक्की करने के लिए कृपया ₹{{5}} की बुकिंग राशि यहाँ जमा करें: {{6}} धन्यवाद।",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "10:30 AM",
+        "500",
+        "https://rzp.io/i/abc123"
+      ]
+    },
+    "mr": {
+      "body": "नमस्कार {{1}}, {{2}} येथे {{3}} रोजी {{4}} ची तुमची अपॉइंटमेंट निश्चित ठेवण्यासाठी कृपया ₹{{5}} ची बुकिंग रक्कम येथे भरा: {{6}} धन्यवाद.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "10:30 AM",
+        "500",
+        "https://rzp.io/i/abc123"
+      ]
+    }
+  }
+}

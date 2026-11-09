@@ -1,0 +1,75 @@
+{
+  "name": "showup_day_before",
+  "category": "UTILITY",
+  "variables": [
+    "patient_name",
+    "clinic_name",
+    "date",
+    "time",
+    "doctor_name"
+  ],
+  "buttons": [
+    {
+      "id": "CONFIRM",
+      "payload": "CONFIRM:{appointment_id}"
+    },
+    {
+      "id": "RESCHEDULE",
+      "payload": "RESCHEDULE:{appointment_id}"
+    },
+    {
+      "id": "CANCEL",
+      "payload": "CANCEL:{appointment_id}"
+    }
+  ],
+  "languages": {
+    "en": {
+      "body": "Hi {{1}}, this is a reminder of your appointment at {{2}} tomorrow, {{3}} at {{4}} with {{5}}. Please confirm, or choose a new time if this no longer suits you.",
+      "footer": null,
+      "button_labels": {
+        "CONFIRM": "Confirm",
+        "RESCHEDULE": "Reschedule",
+        "CANCEL": "Cancel"
+      },
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "10:30 AM",
+        "Dr. Neha Kulkarni"
+      ]
+    },
+    "hi": {
+      "body": "नमस्ते {{1}}, याद दिलाने के लिए: {{2}} में कल, {{3}} को {{4}} पर {{5}} के साथ आपकी अपॉइंटमेंट है। कृपया पुष्टि करें, या समय आपके अनुकूल न हो तो नया समय चुनें।",
+      "footer": null,
+      "button_labels": {
+        "CONFIRM": "पुष्टि करें",
+        "RESCHEDULE": "समय बदलें",
+        "CANCEL": "रद्द करें"
+      },
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "10:30 AM",
+        "Dr. Neha Kulkarni"
+      ]
+    },
+    "mr": {
+      "body": "नमस्कार {{1}}, आठवण: {{2}} येथे उद्या, {{3}} रोजी {{4}} ला {{5}} यांच्यासोबत तुमची अपॉइंटमेंट आहे. कृपया पुष्टी करा, किंवा वेळ सोयीची नसल्यास नवीन वेळ निवडा.",
+      "footer": null,
+      "button_labels": {
+        "CONFIRM": "पुष्टी करा",
+        "RESCHEDULE": "वेळ बदला",
+        "CANCEL": "रद्द करा"
+      },
+      "example": [
+        "Priya",
+        "SmileCare Dental Clinic",
+        "Tue 10 Nov",
+        "10:30 AM",
+        "Dr. Neha Kulkarni"
+      ]
+    }
+  }
+}

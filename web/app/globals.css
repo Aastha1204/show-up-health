@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f4f7f7;
+  --surface: #ffffff;
+  --ink: #0f1f1e;
+  --muted: #5b6b69;
+  --line: #d9e3e1;
+  --accent: #0d9488;
+  --gap-line: #9fb4b1;
+
+  /* appointment status palette: pending amber, confirmed green, rescheduled blue, cancelled red, arrived teal, no-show dark red */
+  --pending-bg: #fef3c7;     --pending-fg: #7c4a03;     --pending-bd: #f59e0b;
+  --confirmed-bg: #dcfce7;   --confirmed-fg: #14532d;   --confirmed-bd: #22c55e;
+  --rescheduled-bg: #dbeafe; --rescheduled-fg: #1e3a8a; --rescheduled-bd: #3b82f6;
+  --cancelled-bg: #fee2e2;   --cancelled-fg: #7f1d1d;   --cancelled-bd: #ef4444;
+  --arrived-bg: #ccfbf1;     --arrived-fg: #134e4a;     --arrived-bd: #14b8a6;
+  --no_show-bg: #7f1d1d;     --no_show-fg: #fee2e2;     --no_show-bd: #450a0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1413;
+    --surface: #121e1d;
+    --ink: #e6f1ef;
+    --muted: #93a8a5;
+    --line: #243533;
+    --accent: #2dd4bf;
+    --gap-line: #3c5855;
+
+    --pending-bg: #422006;     --pending-fg: #fde68a;     --pending-bd: #d97706;
+    --confirmed-bg: #052e16;   --confirmed-fg: #bbf7d0;   --confirmed-bd: #16a34a;
+    --rescheduled-bg: #172554; --rescheduled-fg: #bfdbfe; --rescheduled-bd: #3b82f6;
+    --cancelled-bg: #450a0a;   --cancelled-fg: #fecaca;   --cancelled-bd: #dc2626;
+    --arrived-bg: #042f2e;     --arrived-fg: #99f6e4;     --arrived-bd: #14b8a6;
+    --no_show-bg: #5b0f0f;     --no_show-fg: #fecaca;     --no_show-bd: #991b1b;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* status chips + cards */
+.st { background: var(--st-bg); color: var(--st-fg); border: 1px solid var(--st-bd); }
+.st-pending { --st-bg: var(--pending-bg); --st-fg: var(--pending-fg); --st-bd: var(--pending-bd); }
+.st-confirmed { --st-bg: var(--confirmed-bg); --st-fg: var(--confirmed-fg); --st-bd: var(--confirmed-bd); }
+.st-rescheduled { --st-bg: var(--rescheduled-bg); --st-fg: var(--rescheduled-fg); --st-bd: var(--rescheduled-bd); }
+.st-cancelled { --st-bg: var(--cancelled-bg); --st-fg: var(--cancelled-fg); --st-bd: var(--cancelled-bd); }
+.st-arrived { --st-bg: var(--arrived-bg); --st-fg: var(--arrived-fg); --st-bd: var(--arrived-bd); }
+.st-no_show { --st-bg: var(--no_show-bg); --st-fg: var(--no_show-fg); --st-bd: var(--no_show-bd); }
+.st-cancelled .name { text-decoration: line-through; }
+
+.closed-hatch {
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--muted) 14%, transparent) 6px 7px);
+}
+.gap-block { border: 1.5px dashed var(--gap-line); color: var(--muted); }
+.gap-block:hover { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+@keyframes ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); transform: scale(1.02); } 100% { box-shadow: 0 0 0 10px transparent; transform: scale(1); } }
+.card-pulse { animation: ring 1.1s ease-out 2; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.toast-in { animation: toast-in 180ms ease-out; }
+@keyframes drawer-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.drawer-in { animation: drawer-in 180ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-pulse, .toast-in, .drawer-in, .bubble-in, .sheet-up { animation: none; }
+}
+
+/* the phone is a stand-in for a handset: it keeps its own light "chat" palette in both themes */
+.sim-screen { background: #efeae2; }
+@keyframes bubble-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.bubble-in { animation: bubble-in 220ms ease-out; }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+.sheet-up { animation: sheet-up 220ms ease-out; }
+
+/* ── data-viz tokens (the validated reference palette: slot-1 blue, chart ink and chrome) ── */
+.viz-root {
+  --viz-series: #2a78d6;
+  --viz-ink: #0b0b0b;
+  --viz-ink-2: #52514e;
+  --viz-muted: #898781;
+  --viz-grid: #e1e0d9;
+  --viz-axis: #c3c2b7;
+  --viz-surface: #fcfcfb;
+  --viz-good: #006300;
+  --viz-critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .viz-root {
+    --viz-series: #3987e5; --viz-ink: #f0efec; --viz-ink-2: #c3c2b7; --viz-grid: #2c2c2a;
+    --viz-axis: #383835; --viz-surface: #1a1a19; --viz-good: #0ca30c; --viz-critical: #e66767;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  --viz-series: #3987e5; --viz-ink: #f0efec; --viz-ink-2: #c3c2b7; --viz-grid: #2c2c2a;
+  --viz-axis: #383835; --viz-surface: #1a1a19; --viz-good: #0ca30c; --viz-critical: #e66767;
+}
+.viz-card { background: var(--viz-surface); color: var(--viz-ink); border: 1px solid var(--line); border-radius: 14px; }

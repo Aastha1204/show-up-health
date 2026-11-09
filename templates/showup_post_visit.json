@@ -1,0 +1,43 @@
+{
+  "name": "showup_post_visit",
+  "category": "UTILITY",
+  "category_note": "Meta may re-categorise this template as MARKETING, which changes its price.",
+  "variables": [
+    "clinic_name",
+    "patient_name",
+    "review_link"
+  ],
+  "buttons": [],
+  "languages": {
+    "en": {
+      "body": "Thank you for visiting {{1}} today, {{2}}. If you have a minute, please share your experience: {{3}} It helps us serve you better.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "SmileCare Dental Clinic",
+        "Priya",
+        "https://g.page/r/smilecare-demo/review"
+      ]
+    },
+    "hi": {
+      "body": "आज {{1}} में आने के लिए धन्यवाद, {{2}}। अगर आपके पास एक मिनट हो, तो अपना अनुभव साझा करें: {{3}} इससे हमें बेहतर सेवा देने में मदद मिलती है।",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "SmileCare Dental Clinic",
+        "Priya",
+        "https://g.page/r/smilecare-demo/review"
+      ]
+    },
+    "mr": {
+      "body": "आज {{1}} येथे आल्याबद्दल धन्यवाद, {{2}}. थोडा वेळ असल्यास तुमचा अनुभव सांगा: {{3}} यामुळे आम्हाला अधिक चांगली सेवा देता येते.",
+      "footer": null,
+      "button_labels": {},
+      "example": [
+        "SmileCare Dental Clinic",
+        "Priya",
+        "https://g.page/r/smilecare-demo/review"
+      ]
+    }
+  }
+}
