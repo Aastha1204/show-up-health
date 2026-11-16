@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import jobs
 from .config import get_settings
-from .db import make_pool
+from .db import is_serverless, make_pool
 from .messaging.service import MessagingService
 from .routers import analytics, appointments, broadcast, calendar, demo, imports, inbox, internal, patients, public, settings, simulator, waitlist, webhooks
 
@@ -22,15 +22,33 @@ log = logging.getLogger("showup")
 TICK_SECONDS = 30
 
 
+_init_lock = asyncio.Lock()
+
+
+async def ensure_state(app: FastAPI) -> None:
+    """Create the DB pool and messaging service once. Called from lifespan AND (lazily) from a middleware, because some serverless
+    hosts (Vercel) may not run ASGI lifespan events. Safe to call repeatedly and concurrently."""
+    if hasattr(app.state, "pool"):
+        return
+    async with _init_lock:
+        if hasattr(app.state, "pool"):
+            return
+        pool = make_pool(get_settings().database_url)
+        await pool.open()
+        app.state.pool = pool
+        # Simulator "delivered/read" ticks are delayed background tasks; a serverless instance can freeze between requests,
+        # so there the Simulator shows "Sent" only (everything else is unaffected).
+        app.state.messaging = MessagingService(pool, sim_delays=None) if is_serverless() else MessagingService(pool)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     s = get_settings()
-    pool = make_pool(s.database_url)
-    await pool.open()
-    app.state.pool = pool
-    app.state.messaging = MessagingService(pool)
+    await ensure_state(app)
+    pool = app.state.pool
     scheduler = None
-    if s.scheduler_enabled:
+    # No in-process scheduler on serverless: drive POST /internal/tick from an external cron instead.
+    if s.scheduler_enabled and not is_serverless():
         async def _tick():
             try:
                 counts = await jobs.tick(pool, app.state.messaging)
@@ -55,6 +73,12 @@ def create_app() -> FastAPI:
         CORSMiddleware, allow_origins=get_settings().cors_origins,
         allow_methods=["*"], allow_headers=["*"],
     )
+
+    @app.middleware("http")
+    async def _lazy_state(request, call_next):
+        if not hasattr(request.app.state, "pool"):
+            await ensure_state(request.app)
+        return await call_next(request)
 
     @app.get("/health")
     async def health():

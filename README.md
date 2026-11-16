@@ -149,6 +149,31 @@ optionally `NEXT_PUBLIC_EMBED_ORIGINS`. The anon key is the only Supabase value 
 - **Not built:** a two-way Google Calendar integration (a read-only calendar feed exists instead), refunds/receipts for deposits, and translations of free-text replies and the dashboard. Hindi/Marathi template text is a first draft that needs a native speaker's review (see Phase 8).
 - **Known limits:** the public-booking rate limiter is in memory (one API process); an ambiguous Live send (timeout after the request left) is not retried, to avoid messaging a patient twice, and shows as failed with a clear reason.
 
+## Deploy the demo on Vercel + Supabase (no Railway)
+
+Two Vercel projects from the same GitHub repo (**web** and **api**) and one Supabase Postgres. This is the *demo* setup (fictional data, one-click
+"Sign in as owner/reception"): it uses Supabase only as a database, **not** Supabase Auth.
+
+1. **Supabase:** new project. Open *Connect* and copy two strings (replace `[YOUR-PASSWORD]`): the **Session pooler** (port 5432) and the
+   **Transaction pooler** (port 6543).
+2. **Create the tables and demo data** from your laptop, in `api/`, using the *Session pooler* string:
+   `DATABASE_URL="<session pooler>" python -m app.migrate` then `DATABASE_URL="<session pooler>" python -m app.seed`.
+   (PowerShell: `$env:DATABASE_URL="<session pooler>"` first.) Run the seed again whenever you want the demo dates refreshed.
+3. **API project:** Vercel > Add New > Project > this repo > *Import single project* on **api** (Root Directory `api`, FastAPI). Environment variables:
+   `DATABASE_URL` = the *Transaction pooler* string; `DEMO_MODE=true`; `SUPABASE_JWT_SECRET` = any long random text; `INTERNAL_TICK_SECRET` = any
+   long random text; `PUBLIC_BOOKING_ALLOWED_ORIGINS` = the web project's URL. **Do not set `SUPABASE_URL`** (the one-click login only exists when it is empty).
+   Check `https://<api-project>.vercel.app/health` answers `{"ok":true}` and `/health/ready` says `migrated: true`. If you see a Vercel login page
+   instead, turn off *Deployment Protection* for this project.
+4. **Web project:** add `API_URL` = `https://<api-project>.vercel.app` (no trailing slash), then *Redeploy*. Leave `NEXT_PUBLIC_SUPABASE_*` unset.
+5. *(Optional)* Automatic reminders need something to call the API every minute because serverless has no timer: a free cron service
+   (e.g. cron-job.org) doing `POST https://<api-project>.vercel.app/internal/tick` with the header `X-Internal-Secret: <your INTERNAL_TICK_SECRET>`.
+   The demo buttons (*Fire a reminder*, *Cancel it & offer the slot*) work without it.
+
+What changes on Vercel (automatic, detected from `VERCEL=1`): no in-process scheduler; the Simulator shows "Sent" but not the delayed "delivered/read"
+ticks; each instance keeps a 3-connection pool and no prepared statements (pgbouncer-safe); the database pool is created on the first request.
+**Not verified:** this exact Vercel set-up has not been run here (no Vercel/Supabase account access); it is tested with a simulated serverless
+start-up only. The one-click login on a public URL lets anyone in, including *Reset demo*: fictional data only.
+
 ## Phase 8: extras
 
 **Hindi and Marathi messages.** All seven patient-facing templates now have Hindi and Marathi text (`/templates/*.json`). A patient's
