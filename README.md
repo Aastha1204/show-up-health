@@ -157,6 +157,8 @@ Two Vercel projects from the same GitHub repo (**web** and **api**) and one Post
    `PUBLIC_BOOKING_ALLOWED_ORIGINS` = the web project's URL.
    Check `https://<api-project>.vercel.app/health` answers `{"ok":true}` and `/health/ready` says `migrated: true`. If you see a Vercel login page
    instead, turn off *Deployment Protection* for this project.
+   **Deploying from the `api` folder alone** (e.g. `vercel deploy --prod` run inside `api/`): first copy the message templates in, because
+   `/templates` sits outside that folder: `cp -r ../templates templates` (the copy is git-ignored; the app prefers the repo's `/templates` when present).
 4. **Web project:** add `API_URL` = `https://<api-project>.vercel.app` (no trailing slash), then *Redeploy*.
 5. *(Optional)* Automatic reminders need something to call the API every minute because serverless has no timer: a free cron service
    (e.g. cron-job.org) doing `POST https://<api-project>.vercel.app/internal/tick` with the header `X-Internal-Secret: <your INTERNAL_TICK_SECRET>`.

@@ -38,3 +38,15 @@ def test_rendered_translation_passes_the_medical_content_guard(name, lang):
 def test_unknown_language_still_falls_back_to_english():
     r = templates.render("showup_day_before", "ta", templates.sample_values("showup_day_before"), ids={"appointment_id": "a"})
     assert r.language == "en"
+
+
+def test_template_dir_falls_back_to_the_copy_bundled_inside_api(tmp_path):
+    from pathlib import Path
+    missing, bundled = tmp_path / "templates", tmp_path / "api" / "templates"
+    bundled.mkdir(parents=True)
+    (bundled / "x.json").write_text("{}")
+    assert templates.find_template_dir([missing, bundled]) == bundled              # repo copy absent (api deployed alone)
+    (missing).mkdir()
+    (missing / "y.json").write_text("{}")
+    assert templates.find_template_dir([missing, bundled]) == missing              # repo copy wins when present
+    assert templates.TEMPLATE_DIR.is_dir() and len(list(Path(templates.TEMPLATE_DIR).glob("*.json"))) == 9

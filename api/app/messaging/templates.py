@@ -8,7 +8,17 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-TEMPLATE_DIR = Path(__file__).resolve().parents[3] / "templates"
+def find_template_dir(candidates: list[Path]) -> Path:
+    """First candidate that holds template files. The repo's /templates is the single source of truth; a copy in api/templates is
+    what gets uploaded when the API is deployed from the api folder alone (Vercel), because /templates sits outside it."""
+    for c in candidates:
+        if c.is_dir() and any(c.glob("*.json")):
+            return c
+    return candidates[0]
+
+
+_HERE = Path(__file__).resolve()
+TEMPLATE_DIR = find_template_dir([_HERE.parents[3] / "templates", _HERE.parents[2] / "templates"])
 _PLACEHOLDER = re.compile(r"\{\{(\d+)\}\}")
 
 
