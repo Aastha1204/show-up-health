@@ -108,3 +108,14 @@ body {
   --viz-axis: #383835; --viz-surface: #1a1a19; --viz-good: #0ca30c; --viz-critical: #e66767;
 }
 .viz-card { background: var(--viz-surface); color: var(--viz-ink); border: 1px solid var(--line); border-radius: 14px; }
+
+/* ── phones (iOS Safari / Android Chrome) ── */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+button, a, [role="tab"] { touch-action: manipulation; }          /* no double-tap zoom delay on tappable things */
+@media (max-width: 639px) {
+  /* iOS zooms the whole page into any input whose text is smaller than 16px: keep them at 16px */
+  input, select, textarea { font-size: 16px !important; }
+  /* comfortable tap targets for the small ghost buttons */
+  button { min-height: 36px; }
+}

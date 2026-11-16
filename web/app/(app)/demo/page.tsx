@@ -90,7 +90,7 @@ export default function DemoPage() {
   const ttl = useMutation({ mutationFn: (minutes: number) => api("/demo/ttl", { method: "PUT", body: JSON.stringify({ minutes }) }), onSuccess: () => qc.invalidateQueries({ queryKey: ["demo-state"] }), onError: fail });
   const mode = useMutation({
     mutationFn: (m: "live" | "simulator") => api("/demo/mode", { method: "PUT", body: JSON.stringify({ mode: m }) }),
-    onSuccess: (_d, m) => { toast(m === "simulator" ? "Simulator mode: messages show only in the phone on the left." : "Live mode on.", "success"); qc.invalidateQueries({ queryKey: ["demo-state"] }); },
+    onSuccess: (_d, m) => { toast(m === "simulator" ? "Simulator mode: messages show only in the patient's phone." : "Live mode on.", "success"); qc.invalidateQueries({ queryKey: ["demo-state"] }); },
     onError: fail,
   });
   const summary = useMutation({
@@ -120,7 +120,7 @@ export default function DemoPage() {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h1 className="text-xl font-semibold">Presenter view</h1>
-          <p className="text-xs text-[var(--muted)]">The patient&apos;s phone on the left, the clinic&apos;s live schedule on the right.</p>
+          <p className="text-xs text-[var(--muted)]">The patient&apos;s phone and the clinic&apos;s live schedule.</p>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase ${st?.mode === "live" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-amber-500/15 text-amber-800 dark:text-amber-200"}`} data-testid="mode-badge">
@@ -130,7 +130,7 @@ export default function DemoPage() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Card n="1" title="Add the prospect" hint="Books tomorrow (the next working day) at the next free slot and sends the confirmation now.">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" aria-label="Prospect name" className={inputCls} />
           <div className="flex gap-2">
@@ -143,7 +143,7 @@ export default function DemoPage() {
           <button className={btnPrimary} disabled={!name.trim() || !phoneOk || prospect.isPending} onClick={() => prospect.mutate()}>{prospect.isPending ? "Booking…" : "Book for tomorrow"}</button>
           {st?.mode === "live"
             ? <p className="text-xs text-emerald-700 dark:text-emerald-300">Live: the confirmation goes to this real phone number.</p>
-            : <p className="text-xs text-[var(--muted)]">Simulator: the confirmation appears in the phone on the left.</p>}
+            : <p className="text-xs text-[var(--muted)]">Simulator: the confirmation appears in the patient&apos;s phone.</p>}
         </Card>
 
         <Card n="2" title="Fire a reminder" hint={selected ? undefined : "Click an appointment on the schedule (or add the prospect) to select it."}>
@@ -200,7 +200,7 @@ export default function DemoPage() {
         </Card>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
         <SimulatorPane compact focus={focus} />
         <section aria-label="Live schedule">
           <div className="mb-2 flex flex-wrap items-center gap-2">

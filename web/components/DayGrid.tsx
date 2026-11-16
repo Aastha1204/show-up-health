@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { fmtTime, hhmmToMin, isoFromIst, istDate, istMinutes, minLabel, weekdayKey } from "@/lib/time";
 import { SOURCE_ICON, STATUS_LABEL, type Appt, type Doctor, type Status } from "@/lib/types";
 import { StatusChip } from "./ui";
@@ -46,7 +47,27 @@ type Props = {
   selectedId?: string | null;
 };
 
-export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap = 20, onOpen, onGap, selectedId }: Props) {
+/** True on a phone-width screen (below Tailwind's `sm`, 640px). */
+function useNarrow() {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const on = () => setNarrow(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return narrow;
+}
+
+export default function DayGrid({ date, doctors: allDoctors, appts: allAppts, nowMs, highlight, minGap = 20, onOpen, onGap, selectedId }: Props) {
+  // Phone: one doctor at a time (two 230px columns do not fit); a segmented control switches between them.
+  const narrow = useNarrow();
+  const [pick, setPick] = useState<string | null>(null);
+  const single = narrow && allDoctors.length > 1;
+  const activeId = allDoctors.some((d) => d.id === pick) ? pick : allDoctors[0]?.id;
+  const doctors = single ? allDoctors.filter((d) => d.id === activeId) : allDoctors;
+  const appts = single ? allAppts.filter((a) => a.doctor_id === activeId) : allAppts;
   const wk = weekdayKey(date);
   const own = (d: Doctor): Range[] => (d.working_hours?.[wk] ?? []).map(([a, b]) => [hhmmToMin(a), hhmmToMin(b)]);
   const today = istDate(new Date(nowMs)), nowMin = istMinutes(new Date(nowMs));
@@ -88,12 +109,30 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
   };
 
   if (!blocks.length) return null;
-  const cols = `56px repeat(${doctors.length}, minmax(230px, 1fr))`;
+  const axis = narrow ? 48 : 56, colMin = single ? 0 : 230;
+  const cols = `${axis}px repeat(${doctors.length}, minmax(${colMin}px, 1fr))`;
   const nowInside = date === today && blocks.some((b) => nowMin >= b.start && nowMin <= b.end);
 
   return (
+    <>
+    {single && (
+      <div role="tablist" aria-label="Doctor" className="mb-2 flex gap-1 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-1">
+        {allDoctors.map((d) => {
+          const n = allAppts.filter((a) => a.doctor_id === d.id && a.status !== "cancelled").length;
+          return (
+            <button key={d.id} role="tab" aria-selected={d.id === activeId} onClick={() => setPick(d.id)}
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-semibold ${d.id === activeId ? "bg-teal-600 text-white" : "text-[var(--muted)]"}`}>
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-white/40" style={{ background: d.colour }} aria-hidden />
+              <span className="truncate">{d.name.replace(/^Dr\.?\s*/i, "")}</span>
+              <span className="shrink-0 text-xs font-normal opacity-80">{n}</span>
+            </button>
+          );
+        })}
+      </div>
+    )}
     <div className="overflow-x-auto rounded-xl border border-[var(--line)] bg-[var(--surface)]">
-      <div style={{ minWidth: 56 + doctors.length * 230 }}>
+      <div style={{ minWidth: single ? undefined : axis + doctors.length * 230 }}>
+        {!single && (
         <div className="sticky top-0 z-20 grid border-b border-[var(--line)] bg-[var(--surface)]" style={{ gridTemplateColumns: cols, height: HEAD }}>
           <div />
           {doctors.map((d) => {
@@ -107,6 +146,7 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
             );
           })}
         </div>
+        )}
 
         <div className="relative grid" style={{ gridTemplateColumns: cols, height: H }}>
           {/* time axis */}
@@ -114,7 +154,7 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
             {blocks.flatMap((b) => {
               const ticks = [];
               for (let m = Math.ceil(b.start / 30) * 30; m < b.end; m += 30)
-                ticks.push(<div key={m} className={`absolute right-2 text-[11px] font-medium tabular-nums text-[var(--muted)] ${yOf(m) < 8 ? "" : "-translate-y-1/2"}`} style={{ top: yOf(m) < 8 ? 2 : yOf(m) }}>{m % 60 === 0 ? minLabel(m) : ""}</div>);
+                ticks.push(<div key={m} className={`absolute right-2 text-[11px] font-medium tabular-nums text-[var(--muted)] ${yOf(m) < 8 ? "" : "-translate-y-1/2"}`} style={{ top: yOf(m) < 8 ? 2 : yOf(m) }}>{m % 60 === 0 ? (narrow ? minLabel(m).replace(":00 ", " ") : minLabel(m)) : ""}</div>);
               return ticks;
             })}
           </div>
@@ -180,5 +220,6 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
         </div>
       </div>
     </div>
+    </>
   );
 }

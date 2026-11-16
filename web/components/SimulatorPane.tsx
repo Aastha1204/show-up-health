@@ -60,7 +60,7 @@ export default function SimulatorPane({ compact = false, focus = null }: { compa
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-[280px_1fr]">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-[280px_minmax(0,1fr)]">
       <section aria-label="Chats">
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">Chats</h2>
         {threads.isLoading && <p className="text-sm text-[var(--muted)]">Loading…</p>}

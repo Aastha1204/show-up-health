@@ -63,7 +63,7 @@ export default function TodayPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_330px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_330px]">
         <div>
           {apptsQ.isError ? <p role="alert" className="rounded-lg bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">Could not load the schedule. Retrying…</p>
             : !appts || !ref.data ? <div className="h-72 animate-pulse rounded-xl bg-black/5" aria-label="Loading schedule" />

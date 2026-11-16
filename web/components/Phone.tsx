@@ -89,7 +89,7 @@ export default function Phone({ kind, id, clinicName }: { kind: "patient" | "doc
   let lastDay = "";
   return (
     <div className="relative mx-auto w-[360px] max-w-full rounded-[2.2rem] border-[10px] border-neutral-900 bg-neutral-900 shadow-2xl">
-      <div className="relative flex h-[min(680px,calc(100vh-9rem))] min-h-[420px] flex-col overflow-hidden rounded-[1.5rem]">
+      <div className="relative flex h-[min(680px,calc(100dvh-9rem))] min-h-[420px] flex-col overflow-hidden rounded-[1.5rem]">
         {/* header */}
         <div className="flex items-center gap-3 bg-teal-700 px-3 py-2.5 text-white">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-800">
