@@ -114,7 +114,7 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
             {blocks.flatMap((b) => {
               const ticks = [];
               for (let m = Math.ceil(b.start / 30) * 30; m < b.end; m += 30)
-                ticks.push(<div key={m} className="absolute right-2 -translate-y-1/2 text-[10px] text-[var(--muted)]" style={{ top: yOf(m) }}>{m % 60 === 0 ? minLabel(m) : ""}</div>);
+                ticks.push(<div key={m} className={`absolute right-2 text-[11px] font-medium tabular-nums text-[var(--muted)] ${yOf(m) < 8 ? "" : "-translate-y-1/2"}`} style={{ top: yOf(m) < 8 ? 2 : yOf(m) }}>{m % 60 === 0 ? minLabel(m) : ""}</div>);
               return ticks;
             })}
           </div>
@@ -127,7 +127,7 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
                 {blocks.flatMap((b) => {
                   const lines = [];
                   for (let m = Math.ceil(b.start / 60) * 60; m < b.end; m += 60)
-                    lines.push(<div key={m} className="absolute inset-x-0 border-t border-[var(--line)]/70" style={{ top: yOf(m) }} />);
+                    lines.push(<div key={m} className="hour-line absolute inset-x-0" style={{ top: yOf(m) }} />);
                   return lines;
                 })}
                 {hatchFor(d).map(([s, e], i) => (
@@ -155,7 +155,7 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
                         <span className="opacity-80">•••• {a.patient_phone.slice(-4)}</span>
                         {a.patient_no_show_count >= 2 && <span title={`${a.patient_no_show_count} previous no-shows`} className="rounded bg-black/20 px-1 font-bold">⚠{a.patient_no_show_count}</span>}
                         {a.patient_opted_out && <span title="Opted out of WhatsApp">🔕</span>}
-                        {n === 1 && (e - s) * PX >= 60 && <StatusChip status={a.status} className="ml-auto" />}
+                        {n === 1 && (e - s) * PX >= 40 && <StatusChip status={a.status} className="ml-auto" />}
                       </div>
                     </button>
                   );
@@ -174,7 +174,7 @@ export default function DayGrid({ date, doctors, appts, nowMs, highlight, minGap
 
           {nowInside && (
             <div className="pointer-events-none absolute inset-x-0 z-30 border-t-2 border-red-500" style={{ top: yOf(nowMin) }} aria-label="Current time">
-              <span className="absolute -left-0 -top-2 rounded bg-red-500 px-1 text-[10px] font-bold text-white">{minLabel(nowMin)}</span>
+              <span className="absolute left-1 top-0 -translate-y-1/2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold tabular-nums text-white shadow">{minLabel(nowMin)}</span>
             </div>
           )}
         </div>
