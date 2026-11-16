@@ -337,3 +337,15 @@ Where the brief was silent, the simplest option that keeps the demo reliable. Ne
   English-speaking patients (`findUpcoming(..., language)`). The product behaviour is right; two older tests assumed every patient read English.
 - **Not verified against real services:** Razorpay's real API and webhooks (tested against its documented shapes through a mock), Meta's approval of
   the new templates, Google Calendar's handling of the feed (tested as valid iCalendar by our own tests, not imported into Google).
+
+## Supabase removed (after Phase 8)
+- **Decision:** the project no longer depends on Supabase. It was only ever a Postgres host plus an *optional* login and live-update layer, none of
+  which the demo needs, and setting it up was the main obstacle to putting the demo online. Any Postgres works (Neon through Vercel is the suggested one).
+- **What went:** `@supabase/supabase-js`, the Supabase login form, Realtime subscriptions (every screen polls every 3 s, as it already did without
+  Supabase), JWKS token verification, and `app.seed --create-auth-users`. Settings `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+  are gone; `SUPABASE_JWT_SECRET` was renamed `JWT_SECRET` (the old name is still read, so existing `.env` files keep working).
+- **What this means for real use:** the only sign-in is the demo's password-less one (`DEMO_MODE=true`). **There is no real staff authentication any more.**
+  Before this holds real patient data it needs one (email + password or SSO, per-user roles); the server already reads the role from `staff_profile`
+  and never from the token, so adding a real login means issuing tokens for real users.
+- **Left alone on purpose:** migration `002_rls_realtime.sql` (history; it is a no-op without an `auth` schema) and the comment in `001_init.sql`.
+  Older entries in this file that mention Supabase describe how the project was at that time.

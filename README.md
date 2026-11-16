@@ -3,9 +3,9 @@
 Dental-clinic no-show reduction demo: one-tap Confirm / Reschedule / Cancel on WhatsApp, waitlist refill, live
 reception dashboard, ROI analytics. Live WhatsApp and an in-browser Simulator share one code path.
 
-**Status: all 8 build phases are built and verified locally (the "wow" phase is done as scoped in DECISIONS.md). NOT YET
-DEPLOYED, and the Live WhatsApp transport, Razorpay and Supabase login/Realtime have never been run against the real services.**
-See "What is verified, and what is not" below.
+**Status: all 8 build phases are built and verified locally (the "wow" phase is done as scoped in DECISIONS.md). This is a DEMO: it has no
+real staff login (see "Sign-in" below) and must not hold real patient data. The Live WhatsApp transport and Razorpay have never been run against
+the real services.** See "What is verified, and what is not" below.
 
 ## Layout
 ```
@@ -33,16 +33,12 @@ python -m app.seed                      # wipes and reseeds relative to the curr
 uvicorn app.main:app --reload           # http://127.0.0.1:8000/docs
 ```
 
-On Supabase, point `DATABASE_URL` at the project's Postgres connection string and run the same `python -m app.migrate` (a database that was set up earlier by pasting the SQL needs `python -m app.migrate --baseline` once). Then create the two demo users:
-`python -m app.seed --create-auth-users` (needs `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`; **not yet exercised**
-against a real project).
+To use a hosted Postgres (e.g. Neon) instead of the Docker one, point `DATABASE_URL` at its connection string and run the same
+`python -m app.migrate` and `python -m app.seed` (a database that was set up earlier by pasting the SQL needs `python -m app.migrate --baseline` once).
 
-| Demo user | Role | Password |
-|---|---|---|
-| owner@smilecare.demo | owner | `ShowUp-Owner-2026` |
-| reception@smilecare.demo | reception | `ShowUp-Reception-2026` |
-
-Fictional clinic and users; change the passwords via `DEMO_OWNER_PASSWORD` / `DEMO_RECEPTION_PASSWORD` before seeding.
+**Sign-in.** There are no passwords. The login page has two buttons, *Sign in as owner* and *Sign in as reception* (the seed creates
+`owner@smilecare.demo` and `reception@smilecare.demo`). It works only while `DEMO_MODE=true` and `JWT_SECRET` is set. Real staff accounts
+(email + password, per-user roles) are **not built**: add them before this ever holds real patient data.
 
 ### Tests
 ```bash
@@ -58,9 +54,8 @@ TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54329/showup_test pyt
 `TEST_DATABASE_URL` is **dropped and rebuilt** each session — never point it at real data.
 
 ## Run it locally (Phase 2)
-No Supabase needed for local development: leave `SUPABASE_URL` empty, set `SUPABASE_JWT_SECRET` to any long random
-string and `DEMO_MODE=true` in `.env`; that enables a local-only `/auth/dev-login` (it refuses to exist next to a
-configured Supabase project).
+For local development set `JWT_SECRET` to any long random string and `DEMO_MODE=true` in `.env`; that enables the demo's
+password-less `/auth/dev-login` (the login page's two buttons).
 
 ```bash
 cd api && python run.py                 # API on :8000 (run.py = Windows-safe launcher; elsewhere `uvicorn app.main:app` works)
@@ -83,10 +78,8 @@ the *same* `handle_payload()` as `POST /webhooks/whatsapp`; only the signature c
 signature secret = `WA_APP_SECRET`. For local testing expose :8000 with cloudflared/ngrok.
 
 ## The reception UI (Phase 5)
-Open http://localhost:3100 and sign in (local mode shows two buttons; with `NEXT_PUBLIC_SUPABASE_URL` and
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` set it shows the real email/password form, **not yet tested against a real project**).
-Updates arrive by Supabase Realtime when configured, otherwise every live screen polls every 3 s (the header shows
-"Live" or "Polling"). Today shows IST everywhere; on a closed day (Sunday) it offers a jump to the next working day.
+Open http://localhost:3100 and sign in with one of the two buttons. Every live screen polls every 3 s (the header shows "Polling").
+Today shows IST everywhere; on a closed day (Sunday) it offers a jump to the next working day.
 
 ### End-to-end tests (Playwright)
 Needs the stack running (`docker compose up -d db`, API on :8000, web on :3100; running servers are reused).
@@ -121,21 +114,20 @@ npx playwright test                                        # re-seeds first; use
 ### What you need
 | Piece | Used for | Notes |
 |---|---|---|
-| **Supabase** project | Postgres, staff login, Realtime | Run `python -m app.migrate` against its connection string. Create the two staff users with `python -m app.seed --create-auth-users` (needs the service-role key). |
+| **Postgres** (Neon, or any host) | the database | Run `python -m app.migrate` against its connection string. |
 | **Meta WhatsApp Business** account | real WhatsApp messages | Test number: only 5 pre-verified recipients, fine for rehearsal. For a prospect's phone register a **dedicated real number** (a spare SIM, never a personal number). |
 | **Railway** (or any always-on host) | the API | One replica only: the 30-second reminder scheduler runs inside it. Free tiers that sleep will stop reminders. |
 | **Vercel** | the web app | Root directory `web`. |
 
 ### Environment variables
-API (Railway): `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_JWT_SECRET` (only for older HS256 projects; otherwise JWKS is used), `SUPABASE_SERVICE_ROLE_KEY`,
+API (Railway): `DATABASE_URL`, `JWT_SECRET` (only with `DEMO_MODE=true`),
 `WA_ACCESS_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_BUSINESS_ACCOUNT_ID`, `WA_APP_SECRET`, `WA_VERIFY_TOKEN`, `WA_API_VERSION`, `INTERNAL_TICK_SECRET`,
 `PUBLIC_BOOKING_ALLOWED_ORIGINS` (the web app's URL and the clinic website's), `PUBLIC_API_URL`, `TRUSTED_PROXY_HOPS` (1 on Railway), `APP_TIMEZONE=Asia/Kolkata`.
 **`DEMO_MODE` must be `false` in production**: it enables the Simulator endpoints, the demo controls (including *Reset demo*, which wipes data) and nothing else.
-Web (Vercel): `API_URL` (the API's public address; the browser only ever calls `/api/*`, which Next proxies), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-optionally `NEXT_PUBLIC_EMBED_ORIGINS`. The anon key is the only Supabase value that reaches the browser.
+Web (Vercel): `API_URL` (the API's public address; the browser only ever calls `/api/*`, which Next proxies), optionally `NEXT_PUBLIC_EMBED_ORIGINS`.
 
 ### Steps
-1. **Database:** create the Supabase project; `DATABASE_URL=… python -m app.migrate`; optionally seed (`python -m app.seed`) for a demo clinic.
+1. **Database:** create a Postgres database; `DATABASE_URL=… python -m app.migrate`; optionally seed (`python -m app.seed`) for a demo clinic.
 2. **API:** deploy the repository root to Railway (`railway.json` builds `api/Dockerfile`; migrations run on every start; health check `/health`, readiness `/health/ready`). Set the variables above.
 3. **Web:** import the repo into Vercel with root directory `web`, set the variables, deploy.
 4. **Meta:** in the Meta app, set the webhook callback to `https://<api-host>/webhooks/whatsapp` with your `WA_VERIFY_TOKEN`, and subscribe to **messages**. (Meta calls the API directly, not through Vercel.)
@@ -145,33 +137,34 @@ optionally `NEXT_PUBLIC_EMBED_ORIGINS`. The anon key is the only Supabase value 
 
 ### What is verified, and what is not
 - **Verified here:** every behaviour through the Simulator (the same send pipeline, webhook handler, state machine and database as Live); the Live transport's *requests and error handling* against Meta's documented request/response shapes (mock HTTP); the Docker image builds, runs as a non-root user, applies migrations on start and reports ready; the whole stack from an empty database on a **production** web build passes the full Playwright suite.
-- **NOT verified (needs real accounts):** that Meta accepts these exact template payloads and approves the templates; sending to a real phone; Meta's real webhooks and signatures; Supabase email/password login, JWKS token verification and Realtime. The Supabase and WhatsApp code paths are written to the documented APIs and tested only against fakes, Razorpay's real API and webhooks, and Meta's approval of the Hindi/Marathi/deposit templates.
-- **Not built:** a two-way Google Calendar integration (a read-only calendar feed exists instead), refunds/receipts for deposits, and translations of free-text replies and the dashboard. Hindi/Marathi template text is a first draft that needs a native speaker's review (see Phase 8).
+- **NOT verified (needs real accounts):** that Meta accepts these exact template payloads and approves the templates; sending to a real phone; Meta's real webhooks and signatures; Razorpay's real API and webhooks; Meta's approval of the Hindi/Marathi/deposit templates. The WhatsApp and Razorpay code paths are written to the documented APIs and tested only against fakes.
+- **Not built:** real staff login (the demo's sign-in has no passwords), a two-way Google Calendar integration (a read-only calendar feed exists instead), refunds/receipts for deposits, and translations of free-text replies and the dashboard. Hindi/Marathi template text is a first draft that needs a native speaker's review (see Phase 8).
 - **Known limits:** the public-booking rate limiter is in memory (one API process); an ambiguous Live send (timeout after the request left) is not retried, to avoid messaging a patient twice, and shows as failed with a clear reason.
 
-## Deploy the demo on Vercel + Supabase (no Railway)
+## Deploy the demo on Vercel + a free Postgres (no Railway, no Supabase)
 
-Two Vercel projects from the same GitHub repo (**web** and **api**) and one Supabase Postgres. This is the *demo* setup (fictional data, one-click
-"Sign in as owner/reception"): it uses Supabase only as a database, **not** Supabase Auth.
+Two Vercel projects from the same GitHub repo (**web** and **api**) and one Postgres database. Fictional data and one-click sign-in only.
 
-1. **Supabase:** new project. Open *Connect* and copy two strings (replace `[YOUR-PASSWORD]`): the **Session pooler** (port 5432) and the
-   **Transaction pooler** (port 6543).
-2. **Create the tables and demo data** from your laptop, in `api/`, using the *Session pooler* string:
-   `DATABASE_URL="<session pooler>" python -m app.migrate` then `DATABASE_URL="<session pooler>" python -m app.seed`.
-   (PowerShell: `$env:DATABASE_URL="<session pooler>"` first.) Run the seed again whenever you want the demo dates refreshed.
+1. **Database:** easiest is Neon through Vercel: in the **api** project, *Storage > Create Database > Neon* (it has a free plan). Vercel then adds
+   a `DATABASE_URL` variable to that project for you. (Any hosted Postgres works: paste its connection string as `DATABASE_URL`.) For a pooled
+   (pgbouncer) string the host usually contains `-pooler`; use the pooled one on Vercel and a **direct** (non-pooled) one for step 2.
+2. **Create the tables and demo data** from your laptop, in `api/`, using the *direct* connection string:
+   `DATABASE_URL="<direct string>" python -m app.migrate` then `DATABASE_URL="<direct string>" python -m app.seed`.
+   (PowerShell: `$env:DATABASE_URL="<direct string>"` first.) Run the seed again whenever you want the demo dates refreshed.
+   If the password has special characters (`@ # / ? %`), URL-encode them or choose a letters-and-numbers password.
 3. **API project:** Vercel > Add New > Project > this repo > *Import single project* on **api** (Root Directory `api`, FastAPI). Environment variables:
-   `DATABASE_URL` = the *Transaction pooler* string; `DEMO_MODE=true`; `SUPABASE_JWT_SECRET` = any long random text; `INTERNAL_TICK_SECRET` = any
-   long random text; `PUBLIC_BOOKING_ALLOWED_ORIGINS` = the web project's URL. **Do not set `SUPABASE_URL`** (the one-click login only exists when it is empty).
+   `DATABASE_URL` (the pooled string); `DEMO_MODE=true`; `JWT_SECRET` = any long random text; `INTERNAL_TICK_SECRET` = any long random text;
+   `PUBLIC_BOOKING_ALLOWED_ORIGINS` = the web project's URL.
    Check `https://<api-project>.vercel.app/health` answers `{"ok":true}` and `/health/ready` says `migrated: true`. If you see a Vercel login page
    instead, turn off *Deployment Protection* for this project.
-4. **Web project:** add `API_URL` = `https://<api-project>.vercel.app` (no trailing slash), then *Redeploy*. Leave `NEXT_PUBLIC_SUPABASE_*` unset.
+4. **Web project:** add `API_URL` = `https://<api-project>.vercel.app` (no trailing slash), then *Redeploy*.
 5. *(Optional)* Automatic reminders need something to call the API every minute because serverless has no timer: a free cron service
    (e.g. cron-job.org) doing `POST https://<api-project>.vercel.app/internal/tick` with the header `X-Internal-Secret: <your INTERNAL_TICK_SECRET>`.
    The demo buttons (*Fire a reminder*, *Cancel it & offer the slot*) work without it.
 
 What changes on Vercel (automatic, detected from `VERCEL=1`): no in-process scheduler; the Simulator shows "Sent" but not the delayed "delivered/read"
 ticks; each instance keeps a 3-connection pool and no prepared statements (pgbouncer-safe); the database pool is created on the first request.
-**Not verified:** this exact Vercel set-up has not been run here (no Vercel/Supabase account access); it is tested with a simulated serverless
+**Not verified:** this exact Vercel set-up has not been run here (no Vercel or database account access); it is tested with a simulated serverless
 start-up only. The one-click login on a public URL lets anyone in, including *Reset demo*: fictional data only.
 
 ## Phase 8: extras
@@ -204,7 +197,7 @@ reachable from the internet, so it only works once the app is deployed.
 `GET /demo/state` · `POST /demo/prospect|cancel-seeded|summary|reset` · `PUT /demo/ttl|mode` ·
 `GET|POST /waitlist` · `DELETE /waitlist/{id}` · `GET /broadcasts/running-late/preview` · `POST /broadcasts/running-late` ·
 `POST /auth/dev-login` (local only) · `POST /internal/tick`. Patient actions arrive through the webhook / `POST /simulator/inbound`; there is no
-separate endpoint for them. Auth: `Authorization: Bearer <Supabase access token>`; the role
+separate endpoint for them. Auth: `Authorization: Bearer <demo session token>`; the role
 is read from `staff_profile`, never from the token.
 
 ## Windows note

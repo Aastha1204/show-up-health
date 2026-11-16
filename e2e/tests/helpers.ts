@@ -12,7 +12,7 @@ export type ApptRow = {
 /** Signed-in API client (the same local dev login the UI uses). */
 export async function apiAs(request: APIRequestContext, role: "reception" | "owner" = "reception") {
   const r = await request.post(`${API}/auth/dev-login`, { data: { role } });
-  expect(r.ok(), "dev-login (is DEMO_MODE on and SUPABASE_URL empty?)").toBeTruthy();
+  expect(r.ok(), "dev-login (is DEMO_MODE on and JWT_SECRET set?)").toBeTruthy();
   const token = (await r.json()).access_token as string;
   const headers = { Authorization: `Bearer ${token}` };
   return {

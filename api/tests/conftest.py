@@ -18,13 +18,12 @@ from pathlib import Path
 import pytest
 
 JWT_SECRET = "test-secret-test-secret-test-secret-123456"
-os.environ["SUPABASE_JWT_SECRET"] = JWT_SECRET
+os.environ["JWT_SECRET"] = JWT_SECRET
 os.environ["DEMO_MODE"] = "true"
 os.environ["WA_APP_SECRET"] = "test-app-secret"
 os.environ["WA_VERIFY_TOKEN"] = "verify-me"
 os.environ["INTERNAL_TICK_SECRET"] = "tick-secret"
 os.environ["SCHEDULER_ENABLED"] = "false"
-os.environ["SUPABASE_URL"] = ""   # dev-login only exists when no Supabase project is configured
 os.environ["PUBLIC_BOOKING_ALLOWED_ORIGINS"] = "http://localhost:3100,https://smilecare-clinic.example"
 # The app's OWN database must be the test database: /demo/reset re-seeds (wipes) whatever DATABASE_URL points at,
 # and a test must never be able to touch the development data.

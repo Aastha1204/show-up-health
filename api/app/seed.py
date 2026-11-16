@@ -6,9 +6,7 @@ All seeded patients are is_demo_seed = true, so they can never receive real What
 """
 from __future__ import annotations
 
-import argparse
 import random
-import sys
 import uuid
 from datetime import date, datetime, timedelta
 from typing import Any
@@ -333,42 +331,9 @@ def load(dsn: str, ds: dict[str, Any] | None = None) -> dict[str, Any]:
     return ds
 
 
-def create_auth_users(dsn: str, clinic_id) -> None:
-    """Create the two demo Supabase Auth users (idempotent) and upsert their staff_profile rows."""
-    import os
-    import httpx
-    import psycopg
-    from .config import get_settings
-    s = get_settings()
-    if not (s.supabase_url and s.supabase_service_role_key):
-        sys.exit("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for --create-auth-users")
-    hdr = {"apikey": s.supabase_service_role_key, "Authorization": f"Bearer {s.supabase_service_role_key}"}
-    users = [("owner@smilecare.demo", os.getenv("DEMO_OWNER_PASSWORD", "ShowUp-Owner-2026"), "owner"),
-             ("reception@smilecare.demo", os.getenv("DEMO_RECEPTION_PASSWORD", "ShowUp-Reception-2026"), "reception")]
-    with httpx.Client(base_url=s.supabase_url.rstrip("/"), headers=hdr, timeout=30) as http, \
-            psycopg.connect(dsn) as conn:
-        for email, pw, role in users:
-            r = http.post("/auth/v1/admin/users", json={"email": email, "password": pw, "email_confirm": True})
-            if r.status_code in (200, 201):
-                uid = r.json()["id"]
-            else:  # already registered: find it
-                lst = http.get("/auth/v1/admin/users", params={"per_page": 200}).json()["users"]
-                uid = next(u["id"] for u in lst if u["email"] == email)
-            conn.execute(
-                """insert into staff_profile (clinic_id, user_id, email, role) values (%s,%s,%s,%s)
-                   on conflict (user_id) do update set clinic_id=excluded.clinic_id, role=excluded.role""",
-                [clinic_id, uid, email, role])
-            print(f"staff ready: {email} ({role})")
-
-
 if __name__ == "__main__":
     from .config import get_settings
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--create-auth-users", action="store_true")
-    args = ap.parse_args()
     dsn = get_settings().database_url
     data = load(dsn)
     print(f"seeded {len(data['patients'])} patients, {len(data['appointments'])} appointments; "
           f"cancel-me appointment {data['cancel_me_id']}")
-    if args.create_auth_users:
-        create_auth_users(dsn, data["clinic"]["id"])

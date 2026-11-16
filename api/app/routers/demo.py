@@ -1,4 +1,4 @@
-"""Demo-mode helpers: 'Fire now' for reminder jobs, and a local-only dev login (no Supabase needed)."""
+"""Demo-mode helpers: 'Fire now' for reminder jobs, and the demo's password-less login."""
 from __future__ import annotations
 
 import asyncio
@@ -56,10 +56,10 @@ class DevLogin(BaseModel):
 
 @router.post("/auth/dev-login")
 async def dev_login(body: DevLogin, conn=Depends(get_conn)):
-    """Local development only: mints a token for a seeded demo user. Refuses unless DEMO_MODE is on, a local JWT
-    secret is set, and no Supabase project is configured (so it can never exist next to real auth)."""
+    """The demo's only login: mints a token for a seeded demo user, with no password. Refuses unless DEMO_MODE is on and a
+    JWT secret is set. Never turn DEMO_MODE on for a deployment that holds real patient data."""
     s = get_settings()
-    if not s.demo_mode or s.supabase_url or not s.supabase_jwt_secret:
+    if not s.demo_mode or not s.jwt_secret:
         raise HTTPException(404, "Not found")
     clinic = await (await conn.execute("select id from clinic order by created_at limit 1")).fetchone()
     if not clinic:
@@ -70,7 +70,7 @@ async def dev_login(body: DevLogin, conn=Depends(get_conn)):
         """insert into staff_profile (clinic_id, user_id, email, role) values (%s,%s,%s,%s)
            on conflict (user_id) do update set clinic_id=excluded.clinic_id, role=excluded.role""",
         [clinic["id"], uid, email, body.role])
-    token = jwt.encode({"sub": str(uid), "aud": "authenticated", "email": email}, s.supabase_jwt_secret, "HS256")
+    token = jwt.encode({"sub": str(uid), "aud": "authenticated", "email": email}, s.jwt_secret, "HS256")
     return {"access_token": token, "role": body.role, "email": email}
 
 

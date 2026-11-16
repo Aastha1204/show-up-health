@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { api, ApiError, getToken, setToken } from "./api";
-import { getSupabase } from "./supabase";
 
 export type Me = { user_id: string; clinic_id: string; role: "owner" | "reception"; email: string | null };
 type AuthCtx = { me: Me; token: string; signOut: () => Promise<void> };
@@ -23,21 +22,11 @@ export function AuthGate({ children, roles }: { children: React.ReactNode; roles
   const qc = useQueryClient();
   const [token, setTok] = useState<string | null | undefined>(undefined);
 
-  useEffect(() => {
-    setTok(getToken());
-    const sb = getSupabase();
-    if (!sb) return;
-    const { data } = sb.auth.onAuthStateChange((_e, session) => {   // keeps the stored token fresh after Supabase refreshes it
-      setToken(session?.access_token ?? null);
-      setTok(session?.access_token ?? null);
-    });
-    return () => data.subscription.unsubscribe();
-  }, []);
+  useEffect(() => { setTok(getToken()); }, []);
 
   const meQ = useQuery({ queryKey: ["me", token], queryFn: () => api<Me>("/me"), enabled: !!token, retry: false, staleTime: 60_000 });
 
   const signOut = useCallback(async () => {
-    await getSupabase()?.auth.signOut();
     setToken(null);
     qc.clear();
     router.replace("/login");

@@ -1,8 +1,7 @@
-"""Verify a Supabase access token, then read the role from staff_profile (never from the token)."""
+"""Verify the demo session token (HS256, signed with JWT_SECRET), then read the role from staff_profile (never from the token)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import lru_cache
 from uuid import UUID
 
 import anyio
@@ -24,20 +23,11 @@ class Staff:
     email: str | None
 
 
-@lru_cache
-def _jwks_client(url: str) -> jwt.PyJWKClient:
-    return jwt.PyJWKClient(f"{url.rstrip('/')}/auth/v1/.well-known/jwks.json", cache_keys=True)
-
-
 def _decode_sync(token: str) -> dict:
-    s = get_settings()
-    opts = {"audience": "authenticated"}
-    if s.supabase_jwt_secret:
-        return jwt.decode(token, s.supabase_jwt_secret, algorithms=["HS256"], **opts)
-    if not s.supabase_url:
+    secret = get_settings().jwt_secret
+    if not secret:
         raise jwt.InvalidTokenError("auth not configured")
-    key = _jwks_client(s.supabase_url).get_signing_key_from_jwt(token).key
-    return jwt.decode(token, key, algorithms=["RS256", "ES256"], **opts)
+    return jwt.decode(token, secret, algorithms=["HS256"], audience="authenticated")
 
 
 async def current_staff(

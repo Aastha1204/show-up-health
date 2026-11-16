@@ -39,7 +39,7 @@ async def test_on_vercel_the_simulator_does_not_schedule_delayed_ticks(monkeypat
     async with c:
         await c.get("/health")
     assert app.state.messaging.sim_delays is None
-    assert app.state.pool.max_size == 3                                                          # small pool: many instances share Supabase
+    assert app.state.pool.max_size == 3                                                          # small pool: many instances share one database
     await app.state.pool.close()
 
 
@@ -52,7 +52,7 @@ async def test_locally_nothing_changes(monkeypatch):
     await app.state.pool.close()
 
 
-def test_prepared_statements_are_off_for_supabase_transaction_pooler():
+def test_prepared_statements_are_off_for_pgbouncer_style_poolers():
     p = make_pool("postgresql://u:p@localhost:6543/postgres")
     assert p.kwargs["prepare_threshold"] is None
 

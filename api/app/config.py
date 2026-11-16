@@ -1,16 +1,15 @@
 from functools import lru_cache
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=("../.env", ".env"), extra="ignore")
+    model_config = SettingsConfigDict(env_file=("../.env", ".env"), extra="ignore", populate_by_name=True)
 
     database_url: str = "postgresql://postgres:postgres@127.0.0.1:54329/showup"
-    supabase_url: str = ""
-    supabase_anon_key: str = ""
-    supabase_service_role_key: str = ""
-    supabase_jwt_secret: str = ""
+    # Secret that signs/verifies the demo session token (any long random text). SUPABASE_JWT_SECRET is the old name, still accepted.
+    jwt_secret: str = Field("", validation_alias=AliasChoices("JWT_SECRET", "SUPABASE_JWT_SECRET"))
     demo_mode: bool = False
     internal_tick_secret: str = ""
     public_booking_allowed_origins: str = ""
